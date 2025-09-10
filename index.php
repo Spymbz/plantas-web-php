@@ -8,26 +8,28 @@ try {
     $db = new PDO("sqlsrv:Server=$serverName;Database=$database", $username, $password);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Crear tabla plantas si no existe
-    $db->exec("IF OBJECT_ID('plantas', 'U') IS NULL
-               CREATE TABLE plantas (
+    // Crear tabla sucursales si no existe
+    $db->exec("IF OBJECT_ID('sucursales', 'U') IS NULL
+               CREATE TABLE sucursales (
                    id INT IDENTITY(1,1) PRIMARY KEY,
                    nombre NVARCHAR(255),
-                   tipo NVARCHAR(255)
+                   direccion NVARCHAR(255),
+                   ciudad NVARCHAR(255)
                )");
 
-    // Insertar planta si se envió el formulario
+    // Insertar sucursal si se envió el formulario
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nombre = $_POST['nombre'] ?? '';
-        $tipo = $_POST['tipo'] ?? '';
-        if ($nombre && $tipo) {
-            $stmt = $db->prepare("INSERT INTO plantas (nombre, tipo) VALUES (?, ?)");
-            $stmt->execute([$nombre, $tipo]);
+        $direccion = $_POST['direccion'] ?? '';
+        $ciudad = $_POST['ciudad'] ?? '';
+        if ($nombre && $direccion && $ciudad) {
+            $stmt = $db->prepare("INSERT INTO sucursales (nombre, direccion, ciudad) VALUES (?, ?, ?)");
+            $stmt->execute([$nombre, $direccion, $ciudad]);
         }
     }
 
-    // Obtener todas las plantas
-    $plantas = $db->query("SELECT * FROM plantas")->fetchAll(PDO::FETCH_ASSOC);
+    // Obtener todas las sucursales
+    $sucursales = $db->query("SELECT * FROM sucursales ORDER BY nombre ASC")->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     die("Error de conexión: " . $e->getMessage());
@@ -37,21 +39,33 @@ try {
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Plantas</title>
+    <title>Gestión de Sucursales - Plantas Nativas de Chile</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1, h2 { color: #2C6E49; }
+        form { margin-bottom: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        label { display: block; margin-bottom: 10px; }
+        input[type="text"] { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { background-color: #2C6E49; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #1A4D2E; }
+        ul { list-style-type: none; padding: 0; }
+        li { background-color: #f9f9f9; border: 1px solid #eee; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
+    </style>
 </head>
 <body>
-    <h1>Agregar Planta</h1>
+    <h1>Gestión de Sucursales</h1>
     <form method="POST">
-        <label>Nombre: <input type="text" name="nombre" required></label><br>
-        <label>Tipo: <input type="text" name="tipo" required></label><br>
-        <button type="submit">Guardar</button>
+        <label>Nombre de Sucursal: <input type="text" name="nombre" required></label>
+        <label>Dirección: <input type="text" name="direccion" required></label>
+        <label>Ciudad: <input type="text" name="ciudad" required></label>
+        <button type="submit">Agregar Sucursal</button>
     </form>
 
-    <h2>Lista de Plantas</h2>
+    <h2>Lista de Sucursales</h2>
     <ul>
-        <?php foreach ($plantas as $planta): ?>
-            <li><?= htmlspecialchars($planta['nombre']) ?> (<?= htmlspecialchars($planta['tipo']) ?>)</li>
-        <?php endforeach; ?>
+        <?php foreach ($sucursales as $sucursal): ?>
+            <li><strong><?= htmlspecialchars($sucursal['nombre']) ?></strong> - <?= htmlspecialchars($sucursal['direccion']) ?> (<?= htmlspecialchars($sucursal['ciudad']) ?>)</li>
+        <?php endphp; ?>
     </ul>
 </body>
 </html>
