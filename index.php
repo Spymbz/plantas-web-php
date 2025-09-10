@@ -1,8 +1,8 @@
 <?php
-$serverName = "newDatabaseNewServer.database.windows.net"; // tu servidor
+$serverName = "server-bd-plantas.database.windows.net";
 $database = "bd-plantas-nativas";
 $username = "rootbd";
-$password = "TU_PASSWORD_AQUI";
+$password = "Benjamin123.";
 
 try {
     $db = new PDO("sqlsrv:Server=$serverName;Database=$database", $username, $password);
