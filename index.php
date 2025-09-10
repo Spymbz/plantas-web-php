@@ -1,20 +1,20 @@
 <?php
-// Configuración de conexión a Azure SQL (MySQL)
-$host = 'tu-servidor.mysql.database.azure.com';
-$dbname = 'nombre_base';
-$user = 'root';
-$pass = 'tu_password';
+$serverName = "newDatabaseNewServer.database.windows.net"; // tu servidor
+$database = "bd-plantas-nativas";
+$username = "rootbd";
+$password = "TU_PASSWORD_AQUI";
 
 try {
-    $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+    $db = new PDO("sqlsrv:Server=$serverName;Database=$database", $username, $password);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Crear tabla plantas si no existe
-    $db->exec("CREATE TABLE IF NOT EXISTS plantas (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        nombre VARCHAR(255),
-        tipo VARCHAR(255)
-    )");
+    $db->exec("IF OBJECT_ID('plantas', 'U') IS NULL
+               CREATE TABLE plantas (
+                   id INT IDENTITY(1,1) PRIMARY KEY,
+                   nombre NVARCHAR(255),
+                   tipo NVARCHAR(255)
+               )");
 
     // Insertar planta si se envió el formulario
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
