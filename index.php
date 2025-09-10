@@ -1,5 +1,5 @@
 <?php
-$serverName = "server-bd-plantas.database.windows.net";
+$serverName = "server-bd-plantas.database.windows.net,1433";
 $database = "bd-plantas-nativas";
 $username = "rootbd";
 $password = "Benjamin123.";
