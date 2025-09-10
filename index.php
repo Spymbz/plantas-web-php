@@ -22,15 +22,21 @@ try {
     }
 
     // Insertar planta si se envió el formulario
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $nombre = trim($_POST['nombre'] ?? '');
-        $tipo   = trim($_POST['tipo'] ?? '');
+    // Insertar planta si se envió el formulario
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nombre = trim($_POST['nombre'] ?? '');
+    $tipo   = trim($_POST['tipo'] ?? '');
 
-        if ($nombre && $tipo) {
-            $stmt = $db->prepare("INSERT INTO plantas (nombre, tipo) VALUES (?, ?)");
-            $stmt->execute([$nombre, $tipo]);
-        }
+    if ($nombre && $tipo) {
+        $stmt = $db->prepare("INSERT INTO plantas (nombre, tipo) VALUES (?, ?)");
+        $stmt->execute([$nombre, $tipo]);
+
+        // Evitar reenvío al recargar: redirigir a la misma página
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
     }
+}
+
 
     // Obtener todas las plantas ordenadas por nombre
     $plantas = $db->query("SELECT * FROM plantas ORDER BY nombre ASC")->fetchAll(PDO::FETCH_ASSOC);
