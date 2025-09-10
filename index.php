@@ -1,29 +1,38 @@
 <?php
-// Conexión a base de datos SQLite en memoria
-$db = new PDO('sqlite::memory:');
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Configuración de conexión a Azure SQL (MySQL)
+$host = 'tu-servidor.mysql.database.azure.com';
+$dbname = 'nombre_base';
+$user = 'root';
+$pass = 'tu_password';
 
-// Crear tabla plantas si no existe
-$db->exec("CREATE TABLE IF NOT EXISTS plantas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT,
-    tipo TEXT
-)");
+try {
+    $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Insertar planta si se envió el formulario
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = $_POST['nombre'] ?? '';
-    $tipo = $_POST['tipo'] ?? '';
-    if ($nombre && $tipo) {
-        $stmt = $db->prepare("INSERT INTO plantas (nombre, tipo) VALUES (?, ?)");
-        $stmt->execute([$nombre, $tipo]);
+    // Crear tabla plantas si no existe
+    $db->exec("CREATE TABLE IF NOT EXISTS plantas (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nombre VARCHAR(255),
+        tipo VARCHAR(255)
+    )");
+
+    // Insertar planta si se envió el formulario
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $nombre = $_POST['nombre'] ?? '';
+        $tipo = $_POST['tipo'] ?? '';
+        if ($nombre && $tipo) {
+            $stmt = $db->prepare("INSERT INTO plantas (nombre, tipo) VALUES (?, ?)");
+            $stmt->execute([$nombre, $tipo]);
+        }
     }
+
+    // Obtener todas las plantas
+    $plantas = $db->query("SELECT * FROM plantas")->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    die("Error de conexión: " . $e->getMessage());
 }
-
-// Obtener todas las plantas
-$plantas = $db->query("SELECT * FROM plantas")->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
